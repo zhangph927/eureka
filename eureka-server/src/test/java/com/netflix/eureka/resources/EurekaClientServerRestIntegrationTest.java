@@ -42,6 +42,7 @@ import static org.mockito.Mockito.when;
  * Test REST layer of client/server communication. This test instantiates fully configured Jersey container,
  * which is essential to verifying content encoding/decoding with different format types (JSON vs XML, compressed vs
  * uncompressed).
+ * 在这测试里，他会将eureka注册中心启动起来，然后模拟eureka客户端（服务）去发送各种请求到eureka注册中心，去测试各种功能
  *
  * @author Tomasz Bak
  */
