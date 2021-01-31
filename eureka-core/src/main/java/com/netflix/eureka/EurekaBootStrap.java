@@ -145,6 +145,7 @@ public class EurekaBootStrap implements ServletContextListener {
      * init hook for server context. Override for custom logic.
      */
     protected void initEurekaServerContext() throws Exception {
+        //1、第一步：加载eureka-server.properties文件中的配置
         EurekaServerConfig eurekaServerConfig = new DefaultEurekaServerConfig();
 
         // For backward compatibility
@@ -155,6 +156,7 @@ public class EurekaBootStrap implements ServletContextListener {
         logger.info(eurekaServerConfig.getJsonCodecName());
         ServerCodecs serverCodecs = new DefaultServerCodecs(eurekaServerConfig);
 
+        //第二步：初始化eureka-server内部的一个eureka-client（用来跟其他的eureka-server节点进行注册和通信的）
         ApplicationInfoManager applicationInfoManager = null;
 
         if (eurekaClient == null) {
