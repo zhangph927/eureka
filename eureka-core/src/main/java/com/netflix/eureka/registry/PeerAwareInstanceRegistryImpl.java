@@ -70,6 +70,8 @@ import javax.inject.Singleton;
  * </p>
  *
  * <p>
+ *     这个eureka server启动的时候，会尝试从其他的eureka server上过去抓取注册表的信息，如果抓取失败了，那么就不会让其他的服务实例来自己这里
+ *     进行服务发现，获取自己的注册表的信息
  * When the eureka server starts up it tries to fetch all the registry
  * information from the peer eureka nodes.If for some reason this operation
  * fails, the server does not allow the user to get the registry information for
@@ -78,6 +80,9 @@ import javax.inject.Singleton;
  * </p>
  *
  * <p>
+ *     如果说当前eureka server获取心跳的比例低于一定的比例的话，在一定的时间内，比如一共有20个服务实例，在15分钟之内，就10个服务实例
+ *     来发送心跳，eureka server就自己认为自己处理网络故障，不会将那10个服务实例给摘除，而是让自己进入一个自我保护机制，就是自己
+ *     不再摘除任何的服务实例
  * One important thing to note about <em>renewals</em>.If the renewal drops more
  * than the specified threshold as specified in
  * {@link com.netflix.eureka.EurekaServerConfig#getRenewalPercentThreshold()} within a period of

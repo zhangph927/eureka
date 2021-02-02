@@ -156,9 +156,10 @@ public class EurekaBootStrap implements ServletContextListener {
         logger.info(eurekaServerConfig.getJsonCodecName());
         ServerCodecs serverCodecs = new DefaultServerCodecs(eurekaServerConfig);
 
-        //第二步：初始化eureka-server内部的一个eureka-client（用来跟其他的eureka-server节点进行注册和通信的）
+        //第二步：初始化ApplicationInfoManager
         ApplicationInfoManager applicationInfoManager = null;
 
+        //第三步：初始化eureka-server内部的一个eureka-client（用来跟其他的eureka-server节点进行注册和通信的）
         if (eurekaClient == null) {
             EurekaInstanceConfig instanceConfig = isCloud(ConfigurationManager.getDeploymentContext())
                     ? new CloudInstanceConfig()
@@ -173,6 +174,7 @@ public class EurekaBootStrap implements ServletContextListener {
             applicationInfoManager = eurekaClient.getApplicationInfoManager();
         }
 
+        //第三步： 处理注册相关的事情
         PeerAwareInstanceRegistry registry;
         if (isAws(applicationInfoManager.getInfo())) {
             registry = new AwsInstanceRegistry(
@@ -192,6 +194,7 @@ public class EurekaBootStrap implements ServletContextListener {
             );
         }
 
+        //第四步：处理peer节点相关的事情
         PeerEurekaNodes peerEurekaNodes = getPeerEurekaNodes(
                 registry,
                 eurekaServerConfig,
@@ -200,6 +203,7 @@ public class EurekaBootStrap implements ServletContextListener {
                 applicationInfoManager
         );
 
+        //第五步：完成eureka server 上下文（context）的构建
         serverContext = new DefaultEurekaServerContext(
                 eurekaServerConfig,
                 serverCodecs,
@@ -214,10 +218,12 @@ public class EurekaBootStrap implements ServletContextListener {
         logger.info("Initialized server context");
 
         // Copy registry from neighboring eureka node
+        //第六步：处理一点善后的事情，从相邻的eureka节点拷贝注册信息
         int registryCount = registry.syncUp();
         registry.openForTraffic(applicationInfoManager, registryCount);
 
         // Register all monitoring statistics.
+        //第七步：处理一点善后的事情，注册所有的监控统计项
         EurekaMonitors.registerAllStats();
     }
     
