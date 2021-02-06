@@ -275,6 +275,11 @@ public abstract class AbstractInstanceRegistry implements InstanceRegistry {
             registrant.setActionType(ActionType.ADDED);
             recentlyChangedQueue.add(new RecentlyChangedItem(lease));
             registrant.setLastUpdatedTimestamp();
+
+            //抓大放小：很多代码细节，你第一次看的时候，是看不懂的
+            //你如果是来看服务注册的时候，看到这行代码，蒙圈的，invalidateCache，？？？
+            //抓取注册表的时候，走多级缓存的机制，思考，服务实例注册信息变化的时候，就要更新这个缓存
+
             invalidateCache(registrant.getAppName(), registrant.getVIPAddress(), registrant.getSecureVipAddress());
             logger.info("Registered instance {}/{} with status {} (replication={})",
                     registrant.getAppName(), registrant.getId(), registrant.getStatus(), isReplication);
@@ -967,6 +972,8 @@ public abstract class AbstractInstanceRegistry implements InstanceRegistry {
         Map<String, Application> applicationInstancesMap = new HashMap<String, Application>();
         try {
             write.lock();
+
+            //最近3分钟内有变化的服务实例的注册表，增量注册表
             Iterator<RecentlyChangedItem> iter = this.recentlyChangedQueue.iterator();
             logger.debug("The number of elements in the delta queue is :" + this.recentlyChangedQueue.size());
             while (iter.hasNext()) {
