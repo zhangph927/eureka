@@ -393,6 +393,7 @@ public class DiscoveryClient implements EurekaClient {
             );  // use direct handoff
 
             eurekaTransport = new EurekaTransport();
+            //方法名称可以改为 initEurekaTransport()
             scheduleServerEndpointTask(eurekaTransport, args);
 
             AzToRegionMapper azToRegionMapper;
@@ -409,9 +410,13 @@ public class DiscoveryClient implements EurekaClient {
             throw new RuntimeException("Failed to initialize DiscoveryClient!", e);
         }
 
+        //我个人期望看到的代码是，在这个eureka client初始化的过程中
+        //就在这里，先将自己注册到注册中心去，或者是先在这里抓取注册表，都可以
         if (clientConfig.shouldFetchRegistry() && !fetchRegistry(false)) {
             fetchRegistryFromBackup();
         }
+
+        //起码说，这个代码应该在这里来发起一个服务的注册
 
         // call and execute the pre registration handler before all background tasks (inc registration) is started
         if (this.preRegistrationHandler != null) {
@@ -923,6 +928,14 @@ public class DiscoveryClient implements EurekaClient {
             // If the delta is disabled or if it is the first time, get all
             // applications
             Applications applications = getApplications();
+
+            //示范代码
+            //Boolean shouldDisableDelta=clientConfig.shouldDisableDelta();
+            //Boolean isVipAddressEmpty=!Strings.isNullOrEmpty(clientConfig.getRegistryRefreshSingleVipAddress());
+            //Boolean isApplicationsEmpty=applications == null;
+            //Boolean isRegisteredApplicationsEmpty=applications.getRegisteredApplications().size() == 0;
+            //Boolean isClientVersionNotSupportedDelta=applications.getVersion() == -1;
+            //if(shouldDisableDelta || isVipAddressEmpty || forceFullRegistryFetch || isApplicationsEmpty || isRegisteredApplicationsEmpty || isClientVersionNotSupportedDelta){ }
 
             if (clientConfig.shouldDisableDelta()
                     || (!Strings.isNullOrEmpty(clientConfig.getRegistryRefreshSingleVipAddress()))

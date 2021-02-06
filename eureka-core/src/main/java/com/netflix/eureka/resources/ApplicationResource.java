@@ -167,6 +167,10 @@ public class ApplicationResource {
             String dataCenterInfoId = ((UniqueIdentifier) dataCenterInfo).getId();
             if (isBlank(dataCenterInfoId)) {
                 boolean experimental = "true".equalsIgnoreCase(serverConfig.getExperimental("registration.validation.dataCenterInfoId"));
+                //DataCenter dataCenter=DataCenterFactory.get();->根据eureka.server.env=default 还是aws来返回
+                // 实现类可能是DefaultDataCenter,也可能是AWSDataCenter
+                // 直接就是运行一个接口的方法，面向接口编程： dataCenter.refreshData();
+
                 if (experimental) {
                     String entity = "DataCenterInfo of type " + dataCenterInfo.getClass() + " must contain a valid id";
                     return Response.status(400).entity(entity).build();
