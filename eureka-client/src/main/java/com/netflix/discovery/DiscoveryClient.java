@@ -870,22 +870,29 @@ public class DiscoveryClient implements EurekaClient {
         if (isShutdown.compareAndSet(false, true)) {
             logger.info("Shutting down DiscoveryClient ...");
 
+            //这块逻辑不是很核心和重要的
+            //抓大放小：起码就是说第一次看源码的时候，要懂得抓大放小，什么都抓绝对蒙圈
             if (statusChangeListener != null && applicationInfoManager != null) {
                 applicationInfoManager.unregisterStatusChangeListener(statusChangeListener.getId());
             }
 
+            //就是将线程池都给shutdown掉了，释放资源，停止运行的线程
             cancelScheduledTasks();
 
             // If APPINFO was registered
             if (applicationInfoManager != null && clientConfig.shouldRegisterWithEureka()) {
+                //将服务实例的状态设置为:DOWN
                 applicationInfoManager.setInstanceStatus(InstanceStatus.DOWN);
+                //调用unregister()方法
                 unregister();
             }
 
+            //关闭网络通信组件
             if (eurekaTransport != null) {
                 eurekaTransport.shutdown();
             }
 
+            //将监听器都给关了
             heartbeatStalenessMonitor.shutdown();
             registryStalenessMonitor.shutdown();
 
